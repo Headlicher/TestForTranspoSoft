@@ -8,10 +8,6 @@ namespace TestForTranspoSoft
     class ExcelWork
     {
         Excel.Application exApp = new Excel.Application();
-        public ExcelWork()
-        {
-            exApp.Quit();
-        }
 
         public List<T> ListGeneric<T>(TextBox pathBox, int sheetNumber, string charOfColumn, int countOfRows)
         {
@@ -29,6 +25,8 @@ namespace TestForTranspoSoft
                 else
                     list.Add((T)Convert.ChangeType(DateTime.Now, typeof(T)));
             }
+            workbook.Close();
+            exApp.Quit();
             return list;
         }
     }

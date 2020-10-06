@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using Excel = Microsoft.Office.Interop.Excel;
 
 
 namespace TestForTranspoSoft
@@ -9,8 +8,6 @@ namespace TestForTranspoSoft
     /// </summary>
     public partial class MainWindow : Window
     {
-        Excel.Application exApp = new Excel.Application();
-
         public MainWindow()
         {
             InitializeComponent();
@@ -23,13 +20,18 @@ namespace TestForTranspoSoft
 
         private void calculationButton_Click(object sender, RoutedEventArgs e)
         {
-            new Calculate(newTable, pathBox, startDate, finalDate);
-            exApp.Quit();
+            try
+            {
+                new Calculate(newTable, pathBox, startDate, finalDate);
+            }
+            catch
+            {
+                MessageBox.Show("Выберите файл для работы.");
+            }
         }
 
         private void exitButton_Click(object sender, RoutedEventArgs e)
         {
-            exApp.Quit();
             this.Close();
         }
     }

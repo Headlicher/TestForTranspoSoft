@@ -83,8 +83,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Calculate.cs" />
-    <Compile Include="Data.cs" />
-    <Compile Include="ExcelWork.cs" />
+    <Compile Include="Work with data\Data.cs" />
+    <Compile Include="Work with data\DataGenerate.cs" />
+    <Compile Include="Work with data\ExcelWork.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
