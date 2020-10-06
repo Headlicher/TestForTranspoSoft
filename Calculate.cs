@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit;
@@ -21,7 +22,8 @@ namespace TestForTranspoSoft
                     {
                         DateTime start;
                         DateTime final;
-                        if (startDate.Value > lists.startDatesList[i])
+
+                        if (lists.startDatesList[i] > startDate.Value)
                             start = lists.startDatesList[i];
                         else
                             start = (DateTime)startDate.Value;
@@ -41,7 +43,8 @@ namespace TestForTranspoSoft
                         {
                             if (days > 0)
                             {
-                                int daysOnTarif = daysOnTarifCheck(lists.periodStartByTarifList[k], lists.periodEndByTarifList[k]);
+                                int daysOnTarif;
+                                daysOnTarif = daysOnTarifCheck(lists.periodStartByTarifList[k], lists.periodEndByTarifList[k]);
 
                                 if (daysOnTarif > days)
                                     daysOnTarif = (final - periodStartCount).Days + 1;
