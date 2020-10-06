@@ -8,10 +8,6 @@ namespace TestForTranspoSoft
     class Calculate
     {
         ObservableCollection<Data> data = new ObservableCollection<Data>();
-        DateTime start;
-        DateTime final;
-        DateTime periodStartCount;
-        DateTime periodEndCount;
 
         public Calculate(DataGrid newTable, TextBox pathBox, DateTimePicker startDate, DateTimePicker finalDate)
         {
@@ -23,6 +19,8 @@ namespace TestForTranspoSoft
                 {
                     if (startDate.Value <= lists.startDatesList[i] || finalDate.Value >= lists.startDatesList[i])
                     {
+                        DateTime start;
+                        DateTime final;
                         if (startDate.Value > lists.startDatesList[i])
                             start = lists.startDatesList[i];
                         else
@@ -36,7 +34,8 @@ namespace TestForTranspoSoft
 
                         int days = (final - start).Days + 1;
 
-                        periodStartCount = start;
+                        DateTime periodStartCount = start;
+                        DateTime periodEndCount;
 
                         for (int k = 0; k < lists.tarifNumbersList.Count; k++)
                         {
