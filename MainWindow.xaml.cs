@@ -22,7 +22,7 @@ namespace TestForTranspoSoft
         {
             try
             {
-                new Calculate(newTable, pathBox, startDate, finalDate);
+                new Calculate(newTable, pathBox.Text, startDate.Value, finalDate.Value);
             }
             catch
             {

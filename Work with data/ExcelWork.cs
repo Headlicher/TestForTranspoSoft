@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Reflection;
 
 namespace TestForTranspoSoft
 {
@@ -9,21 +9,31 @@ namespace TestForTranspoSoft
     {
         Excel.Application exApp = new Excel.Application();
 
-        public List<T> ListGeneric<T>(TextBox pathBox, int sheetNumber, string charOfColumn, int countOfRows)
+        public List<T> ListGeneric<T>(string pathToFile, int sheetNumber, string charOfColumn)
         {
-            Excel.Workbook workbook = exApp.Workbooks.Open(pathBox.Text);
+            Excel.Workbook workbook = exApp.Workbooks.Open(pathToFile);
             Excel.Worksheet sheet = (Excel.Worksheet)workbook.Sheets[sheetNumber];
+            int countOfRows = sheet.Cells.Find("*", Missing.Value, Missing.Value, Missing.Value, Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious, false, 
+                                                Missing.Value, Missing.Value).Row; //Подсчёт количества заполненных строк в таблице
 
             List <T> list = new List<T>();
             for (int i = 2; i <= countOfRows; i++)
             {
                 Excel.Range range = sheet.get_Range(charOfColumn + i.ToString(), charOfColumn + i.ToString());
-                if (range.Text != "")
+                try
                 {
                     list.Add((T)Convert.ChangeType(range.Text, typeof(T)));
                 }
-                else
-                    list.Add((T)Convert.ChangeType(DateTime.Now, typeof(T)));
+                catch(FormatException)
+                {
+                    T typeCheck = default;
+                    if (typeCheck is DateTime)
+                        list.Add((T)Convert.ChangeType(DateTime.Now, typeof(T)));
+                    else if (typeCheck is int)
+                        list.Add((T)Convert.ChangeType(int.MaxValue, typeof(T)));
+                    else
+                        list.Add((T)Convert.ChangeType("", typeof(T)));
+                }
             }
             workbook.Close();
             exApp.Quit();

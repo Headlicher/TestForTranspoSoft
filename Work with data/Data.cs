@@ -5,7 +5,7 @@ namespace TestForTranspoSoft
     class Data
     {
 
-        public Data(string goods, DateTime startDate, DateTime finalDate, int days, DateTime dateOfStart, DateTime dateOfFinish,int bet, string description)
+        public Data(string goods, DateTime startDate, DateTime finalDate, int days, DateTime dateOfStart, DateTime? dateOfFinish,int bet, string description)
         {
             this.Goods = goods;
             this.StartDate = startDate;
@@ -24,6 +24,6 @@ namespace TestForTranspoSoft
         public int Bet { get; }
         public string Description { get; }
         public DateTime DateOfStart { get; }
-        public DateTime DateOfFinish { get; }
+        public DateTime? DateOfFinish { get; }
     }
 }

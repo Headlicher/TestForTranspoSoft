@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
 
 namespace TestForTranspoSoft
 {
@@ -14,17 +13,16 @@ namespace TestForTranspoSoft
         public List<int> periodEndByTarifList;
         public List<int> betList;
 
-        public DataGenerate(TextBox pathBox)
+        public DataGenerate(string pathToExcelFile)
         {
             ExcelWork ex = new ExcelWork();
-            goodsList = ex.ListGeneric<string>(pathBox, 1, "A", 30);
-            startDatesList = ex.ListGeneric<DateTime>(pathBox, 1, "B", 30);
-            finalDatesList = ex.ListGeneric<DateTime>(pathBox, 1, "C", 30);
-            tarifNumbersList = ex.ListGeneric<int>(pathBox, 2, "A", 5);
-            periodStartByTarifList = ex.ListGeneric<int>(pathBox, 2, "B", 5);
-            periodEndByTarifList = ex.ListGeneric<int>(pathBox, 2, "C", 4);
-            periodEndByTarifList.Add(3650);
-            betList = ex.ListGeneric<int>(pathBox, 2, "D", 5);
+            goodsList = ex.ListGeneric<string>(pathToExcelFile, 1, "A");
+            startDatesList = ex.ListGeneric<DateTime>(pathToExcelFile, 1, "B");
+            finalDatesList = ex.ListGeneric<DateTime>(pathToExcelFile, 1, "C");
+            tarifNumbersList = ex.ListGeneric<int>(pathToExcelFile, 2, "A");
+            periodStartByTarifList = ex.ListGeneric<int>(pathToExcelFile, 2, "B");
+            periodEndByTarifList = ex.ListGeneric<int>(pathToExcelFile, 2, "C");
+            betList = ex.ListGeneric<int>(pathToExcelFile, 2, "D");
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
-using Xceed.Wpf.Toolkit;
 
 namespace TestForTranspoSoft
 {
@@ -10,29 +9,28 @@ namespace TestForTranspoSoft
     {
         ObservableCollection<Data> data = new ObservableCollection<Data>();
 
-        public Calculate(DataGrid newTable, TextBox pathBox, DateTimePicker startDate, DateTimePicker finalDate)
+        public Calculate(DataGrid newTable, string pathToFile, DateTime? startDate, DateTime? finalDate)
         {
-            DataGenerate lists = new DataGenerate(pathBox);
-
-            if (startDate.Value != null && finalDate.Value != null)
+            if (datesCheck(startDate, finalDate) && emptyDatePicker(startDate, finalDate))
             {
+                DataGenerate lists = new DataGenerate(pathToFile);
                 for (int i = 0; i < lists.startDatesList.Count; i++)
                 {
-                    if (startDate.Value <= lists.startDatesList[i] || finalDate.Value >= lists.startDatesList[i])
+                    if (startDate <= lists.startDatesList[i] || finalDate >= lists.startDatesList[i])
                     {
                         DateTime start;
                         DateTime final;
 
-                        if (lists.startDatesList[i] > startDate.Value)
+                        if (lists.startDatesList[i] > startDate)
                             start = lists.startDatesList[i];
                         else
-                            start = (DateTime)startDate.Value;
-                        
-                        if (finalDate.Value > lists.finalDatesList[i])
+                            start = (DateTime)startDate;
+
+                        if (finalDate > lists.finalDatesList[i])
                         {
                             final = lists.finalDatesList[i];
                         }
-                        else final = (DateTime)finalDate.Value;
+                        else final = (DateTime)finalDate;
 
                         int days = (final - start).Days + 1;
 
@@ -54,7 +52,9 @@ namespace TestForTranspoSoft
                                 if (final < periodEndCount)
                                     periodEndCount = final;
 
-                                data.Add(new Data(lists.goodsList[i], periodStartCount, periodEndCount, daysOnTarif, lists.startDatesList[i], lists.finalDatesList[i], 
+                                DateTime? finalDates = isEmptyFinalDate(lists.finalDatesList[i]);
+
+                                data.Add(new Data(lists.goodsList[i], periodStartCount, periodEndCount, daysOnTarif, lists.startDatesList[i], finalDates,
                                                   lists.betList[k], "Период №" + lists.tarifNumbersList[k]));
 
                                 days -= daysOnTarif;
@@ -65,8 +65,10 @@ namespace TestForTranspoSoft
                     newTable.ItemsSource = data;
                 }
             }
+            else if (emptyDatePicker(startDate, finalDate))
+                MessageBox.Show("Указанная дата(или время) окончания расчёта больше, чем дата(или время) начала расчёта, пожалуйста, проверьте правильность введённых данных");
             else
-                System.Windows.MessageBox.Show("Выберите даты начала и окончания расчёта.");
+                MessageBox.Show("Не указаны даты начала и окончания расчёта");
         }
 
         public int daysOnTarifCheck(int start, int end)
@@ -76,6 +78,33 @@ namespace TestForTranspoSoft
 
             else
                 return end - start + 1;
+        }
+
+        public bool datesCheck(DateTime? startDate, DateTime? finalDate)
+        {
+            if (startDate > finalDate)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public DateTime? isEmptyFinalDate(DateTime final)
+        {
+            if (final >= DateTime.Now - TimeSpan.FromSeconds(30))
+            {
+                return null;
+            }
+            return final;
+        }
+
+        public bool emptyDatePicker(DateTime? startDate, DateTime? finalDate)
+        {
+            if(startDate > DateTime.MinValue && finalDate > DateTime.MinValue)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
