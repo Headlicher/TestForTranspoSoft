@@ -5,9 +5,12 @@ using System.Reflection;
 
 namespace TestForTranspoSoft
 {
+    /// <summary>
+    /// Класс, отвечающий за работу с Excel файлами.
+    /// </summary>
     class ExcelWork
     {
-        Excel.Application exApp = new Excel.Application();
+        readonly Excel.Application exApp = new Excel.Application();
 
         public List<T> ListGeneric<T>(string pathToFile, int sheetNumber, string charOfColumn)
         {
@@ -16,7 +19,7 @@ namespace TestForTranspoSoft
             int countOfRows = sheet.Cells.Find("*", Missing.Value, Missing.Value, Missing.Value, Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious, false, 
                                                 Missing.Value, Missing.Value).Row; //Подсчёт количества заполненных строк в таблице
 
-            List <T> list = new List<T>();
+            List <T> list = new List<T>(); // Генерация листа, заданного типа
             for (int i = 2; i <= countOfRows; i++)
             {
                 Excel.Range range = sheet.get_Range(charOfColumn + i.ToString(), charOfColumn + i.ToString());

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace TestForTranspoSoft
 {
+    /// <summary>
+    /// Класс отвечающий за генерацию списков, указанных в нём.
+    /// </summary>
     class DataGenerate
     {
         public List<string> goodsList;

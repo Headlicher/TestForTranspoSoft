@@ -2,6 +2,9 @@
 
 namespace TestForTranspoSoft
 {
+    /// <summary>
+    /// Класс, отвечающий за открытие файлов.
+    /// </summary>
     class OpenFile
     {
         public string FilePath { get; set; }

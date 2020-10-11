@@ -2,76 +2,45 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace TestForTranspoSoft
 {
+    /// <summary>
+    /// Класс, вызываемый при нажатии на кнопку "Расчёт"
+    /// </summary>
     class Calculate
     {
-        ObservableCollection<Data> data = new ObservableCollection<Data>();
+        List<Data> Data = new List<Data>();
 
         public Calculate(DataGrid newTable, string pathToFile, DateTime? startDate, DateTime? finalDate)
         {
-            if (datesCheck(startDate, finalDate) && emptyDatePicker(startDate, finalDate))
+            if (DatesCheck(startDate, finalDate) && EmptyDatePicker(startDate, finalDate))
             {
-                DataGenerate lists = new DataGenerate(pathToFile);
-                for (int i = 0; i < lists.startDatesList.Count; i++)
+                DataGenerate Lists = new DataGenerate(pathToFile); // Вызываем класс генерации списков
+                Data = FullDataList(Lists).ToList(); // Присваиваем списку Data полную таблицу.
+                List<Data> newData = new List<Data>(); //Создаём новый список, который будет содержать в себе изменения из списка Data и выведен в DataGrid
+                IEnumerable<Data> query = Data.Where(data => startDate <= data.StartDate && finalDate >= data.StartDate || startDate <= data.FinalDate && finalDate >= data.FinalDate); //Выводим из полной таблицы только часть, соответствующую условию
+                foreach (Data data in query) //Выполняем преобразования и добавляем в список newData
                 {
-                    if (startDate <= lists.startDatesList[i] || finalDate >= lists.startDatesList[i])
-                    {
-                        DateTime start;
-                        DateTime final;
-
-                        if (lists.startDatesList[i] > startDate)
-                            start = lists.startDatesList[i];
-                        else
-                            start = (DateTime)startDate;
-
-                        if (finalDate > lists.finalDatesList[i])
-                        {
-                            final = lists.finalDatesList[i];
-                        }
-                        else final = (DateTime)finalDate;
-
-                        int days = (final - start).Days + 1;
-
-                        DateTime periodStartCount = start;
-                        DateTime periodEndCount;
-
-                        for (int k = 0; k < lists.tarifNumbersList.Count; k++)
-                        {
-                            if (days > 0)
-                            {
-                                int daysOnTarif;
-                                daysOnTarif = daysOnTarifCheck(lists.periodStartByTarifList[k], lists.periodEndByTarifList[k]);
-
-                                if (daysOnTarif > days)
-                                    daysOnTarif = (final - periodStartCount).Days + 1;
-
-                                periodEndCount = periodStartCount.AddDays(daysOnTarif).Date;
-                                periodEndCount -= TimeSpan.FromSeconds(1);
-                                if (final < periodEndCount)
-                                    periodEndCount = final;
-
-                                DateTime? finalDates = isEmptyFinalDate(lists.finalDatesList[i]);
-
-                                data.Add(new Data(lists.goodsList[i], periodStartCount, periodEndCount, daysOnTarif, lists.startDatesList[i], finalDates,
-                                                  lists.betList[k], "Период №" + lists.tarifNumbersList[k]));
-
-                                days -= daysOnTarif;
-                                periodStartCount = periodEndCount + TimeSpan.FromSeconds(1);
-                            }
-                        }
-                    }
-                    newTable.ItemsSource = data;
+                    if (startDate >= data.StartDate)
+                        data.StartDate = startDate;
+                    if (finalDate <= data.FinalDate)
+                        data.FinalDate = finalDate;
+                    data.Days = (data.FinalDate - data.StartDate).Value.Days + 1;
+                    newData.Add(data);
                 }
+                newTable.ItemsSource = newData;
+
             }
-            else if (emptyDatePicker(startDate, finalDate))
+            else if (EmptyDatePicker(startDate, finalDate))
                 MessageBox.Show("Указанная дата(или время) окончания расчёта больше, чем дата(или время) начала расчёта, пожалуйста, проверьте правильность введённых данных");
             else
                 MessageBox.Show("Не указаны даты начала и окончания расчёта");
         }
 
-        public int daysOnTarifCheck(int start, int end)
+        public int DaysOnTarifCheck(int start, int end) // Генерация расчёта дней по тарифу.
         {
             if (start == 0)
                 return end - start;
@@ -80,7 +49,7 @@ namespace TestForTranspoSoft
                 return end - start + 1;
         }
 
-        public bool datesCheck(DateTime? startDate, DateTime? finalDate)
+        public bool DatesCheck(DateTime? startDate, DateTime? finalDate) // Проверка на то, не больше ли дата начала расчёта, чем дата окончания.
         {
             if (startDate > finalDate)
             {
@@ -89,7 +58,7 @@ namespace TestForTranspoSoft
             return true;
         }
 
-        public DateTime? isEmptyFinalDate(DateTime final)
+        public DateTime? IsEmptyFinalDate(DateTime final) // Проверка на то будет ли ячейка даты ухода со склада пустой.
         {
             if (final >= DateTime.Now - TimeSpan.FromSeconds(30))
             {
@@ -98,13 +67,51 @@ namespace TestForTranspoSoft
             return final;
         }
 
-        public bool emptyDatePicker(DateTime? startDate, DateTime? finalDate)
+        public bool EmptyDatePicker(DateTime? startDate, DateTime? finalDate) // Проверка на то, ввёл пользователь даты или нет
         {
             if(startDate > DateTime.MinValue && finalDate > DateTime.MinValue)
             {
                 return true;
             }
             return false;
+        }
+
+        public ObservableCollection<Data> FullDataList(DataGenerate Lists) //Генерация полной таблицы.
+        {
+            ObservableCollection<Data> fullData = new ObservableCollection<Data>(); // Создаём коллекцию, в которой будет лежать таблица
+            for(int i = 0; i < Lists.startDatesList.Count; i++)
+            {
+                int days = (Lists.finalDatesList[i] - Lists.startDatesList[i]).Days; // Счётчик общего количества дней, которые товар лежал на складе
+
+                DateTime periodStartCount = Lists.startDatesList[i]; //Счётчик даты начала расчёта
+                DateTime periodEndCount; //Счётчик даты конца расчёта
+
+                for (int k = 0; k < Lists.tarifNumbersList.Count; k++)
+                {
+                    if (days > 0)
+                    {
+                        int daysOnTarif; //Счётчик дней по тарифу.
+                        daysOnTarif = DaysOnTarifCheck(Lists.periodStartByTarifList[k], Lists.periodEndByTarifList[k]);
+
+                        if (daysOnTarif > days)
+                            daysOnTarif = (Lists.finalDatesList[i] - periodStartCount).Days + 1;
+
+                        periodEndCount = periodStartCount.AddDays(daysOnTarif).Date;
+                        periodEndCount -= TimeSpan.FromSeconds(1);
+                        if (Lists.finalDatesList[i] < periodEndCount)
+                            periodEndCount = Lists.finalDatesList[i];
+
+                        DateTime? finalDates = IsEmptyFinalDate(Lists.finalDatesList[i]);
+
+                        fullData.Add(new Data(Lists.goodsList[i], periodStartCount, periodEndCount, daysOnTarif, Lists.startDatesList[i], finalDates,
+                                          Lists.betList[k], "Период №" + Lists.tarifNumbersList[k]));
+
+                        days -= daysOnTarif;
+                        periodStartCount = periodEndCount + TimeSpan.FromSeconds(1);
+                    }
+                }
+            }
+            return fullData;
         }
     }
 }
