@@ -16,28 +16,39 @@ namespace TestForTranspoSoft
 
         public Calculate(DataGrid newTable, string pathToFile, DateTime? startDate, DateTime? finalDate)
         {
-            if (DatesCheck(startDate, finalDate) && EmptyDatePicker(startDate, finalDate))
+            try
             {
-                DataGenerate Lists = new DataGenerate(pathToFile); // Вызываем класс генерации списков
-                Data = FullDataList(Lists).ToList(); // Присваиваем списку Data полную таблицу.
-                List<Data> newData = new List<Data>(); //Создаём новый список, который будет содержать в себе изменения из списка Data и выведен в DataGrid
-                IEnumerable<Data> query = Data.Where(data => startDate <= data.StartDate && finalDate >= data.StartDate || startDate <= data.FinalDate && finalDate >= data.FinalDate); //Выводим из полной таблицы только часть, соответствующую условию
-                foreach (Data data in query) //Выполняем преобразования и добавляем в список newData
+                if (DatesCheck(startDate, finalDate) && EmptyDatePicker(startDate, finalDate))
                 {
-                    if (startDate >= data.StartDate)
-                        data.StartDate = startDate;
-                    if (finalDate <= data.FinalDate)
-                        data.FinalDate = finalDate;
-                    data.Days = (data.FinalDate - data.StartDate).Value.Days + 1;
-                    newData.Add(data);
-                }
-                newTable.ItemsSource = newData;
+                    DataGenerate Lists = new DataGenerate(pathToFile); // Вызываем класс генерации списков
+                    Data = FullDataList(Lists).ToList(); // Присваиваем списку Data полную таблицу.
+                    List<Data> newData = new List<Data>(); //Создаём новый список, который будет содержать в себе изменения из списка Data и выведен в DataGrid
+                    IEnumerable<Data> query = Data.Where(data => startDate <= data.StartDate && finalDate >= data.StartDate || startDate <= data.FinalDate && finalDate >= data.FinalDate || data.FinalDate >= DateTime.Now - TimeSpan.FromSeconds(20) && finalDate <= data.FinalDate && startDate > data.StartDate); //Выводим из полной таблицы только часть, соответствующую условию
+                    foreach (Data data in query) //Выполняем преобразования и добавляем в список newData
+                    {
+                        if (startDate >= data.StartDate)
+                            data.StartDate = startDate;
+                        if (finalDate <= data.FinalDate)
+                            data.FinalDate = finalDate;
+                        data.Days = (data.FinalDate.Value.Date - data.StartDate.Value.Date).Days + 1;
+                        newData.Add(data);
+                    }
+                    newTable.ItemsSource = newData;
 
+                }
+                else if (EmptyDatePicker(startDate, finalDate))
+                    MessageBox.Show("Указанная дата(или время) окончания расчёта больше, чем дата(или время) начала расчёта, пожалуйста, проверьте правильность введённых данных");
+                else
+                    MessageBox.Show("Не указаны даты начала и окончания расчёта");
             }
-            else if (EmptyDatePicker(startDate, finalDate))
-                MessageBox.Show("Указанная дата(или время) окончания расчёта больше, чем дата(или время) начала расчёта, пожалуйста, проверьте правильность введённых данных");
-            else
-                MessageBox.Show("Не указаны даты начала и окончания расчёта");
+            catch(System.Runtime.InteropServices.COMException)
+            {
+                MessageBox.Show("Не выбран файл.");
+            }
+            catch
+            {
+                MessageBox.Show("Выберите другой файл");
+            }
         }
 
         public int DaysOnTarifCheck(int start, int end) // Генерация расчёта дней по тарифу.

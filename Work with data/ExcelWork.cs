@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Reflection;
+using System.Windows;
 
 namespace TestForTranspoSoft
 {
@@ -25,17 +26,22 @@ namespace TestForTranspoSoft
                 Excel.Range range = sheet.get_Range(charOfColumn + i.ToString(), charOfColumn + i.ToString());
                 try
                 {
-                    list.Add((T)Convert.ChangeType(range.Text, typeof(T)));
+                    if (range.Text != "")
+                        list.Add((T)Convert.ChangeType(range.Text, typeof(T)));
+                    else
+                    {
+                        T typeCheck = default;
+                        if (typeCheck is DateTime)
+                            list.Add((T)Convert.ChangeType(DateTime.Now, typeof(T)));
+                        else if (typeCheck is int)
+                            list.Add((T)Convert.ChangeType(int.MaxValue, typeof(T)));
+                        else
+                            list.Add((T)Convert.ChangeType("", typeof(T)));
+                    }
                 }
                 catch(FormatException)
                 {
-                    T typeCheck = default;
-                    if (typeCheck is DateTime)
-                        list.Add((T)Convert.ChangeType(DateTime.Now, typeof(T)));
-                    else if (typeCheck is int)
-                        list.Add((T)Convert.ChangeType(int.MaxValue, typeof(T)));
-                    else
-                        list.Add((T)Convert.ChangeType("", typeof(T)));
+                    MessageBox.Show("Выбранный документ не поддерживается.");
                 }
             }
             workbook.Close();

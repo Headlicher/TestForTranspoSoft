@@ -20,19 +20,12 @@ namespace TestForTranspoSoft
 
         private void calculationButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                new Calculate(newTable, pathBox.Text, startDate.Value, finalDate.Value);
-            }
-            catch
-            {
-                MessageBox.Show("Выберите файл для работы.");
-            }
+            new Calculate(newTable, pathBox.Text, startDate.Value, finalDate.Value);   
         }
 
         private void exitButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }
