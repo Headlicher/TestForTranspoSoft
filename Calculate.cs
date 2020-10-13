@@ -23,7 +23,10 @@ namespace TestForTranspoSoft
                     DataGenerate Lists = new DataGenerate(pathToFile); // Вызываем класс генерации списков
                     Data = FullDataList(Lists).ToList(); // Присваиваем списку Data полную таблицу.
                     List<Data> newData = new List<Data>(); //Создаём новый список, который будет содержать в себе изменения из списка Data и выведен в DataGrid
-                    IEnumerable<Data> query = Data.Where(data => startDate <= data.StartDate && finalDate >= data.StartDate || startDate <= data.FinalDate && finalDate >= data.FinalDate || data.FinalDate >= DateTime.Now - TimeSpan.FromSeconds(20) && finalDate <= data.FinalDate && startDate > data.StartDate); //Выводим из полной таблицы только часть, соответствующую условию
+                    IEnumerable<Data> query = Data.Where(data => startDate <= data.StartDate && finalDate >= data.StartDate || 
+                        startDate <= data.FinalDate && finalDate >= data.FinalDate || 
+                        data.FinalDate >= DateTime.Now - TimeSpan.FromSeconds(20) && finalDate <= data.FinalDate && startDate > data.StartDate ||
+                        startDate >= data.StartDate && finalDate <= data.FinalDate); //Выводим из полной таблицы только часть, соответствующую условию
                     foreach (Data data in query) //Выполняем преобразования и добавляем в список newData
                     {
                         if (startDate >= data.StartDate)
